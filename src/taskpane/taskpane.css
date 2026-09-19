@@ -3,31 +3,56 @@
  * See LICENSE in the project root for license information.
  */
 
- html,
- body {
-     width: 100%;
-     height: 100%;
-     margin: 0;
-     padding: 0;
- }
- 
- ul {
-     margin: 0;
-     padding: 0;
- }
- 
- .ms-welcome__header {
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Header del panel */
+.panel-header {
     padding: 20px;
-    padding-bottom: 30px;
-    padding-top: 100px;
+    padding-bottom: 15px;
+    padding-top: 30px;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
     flex-direction: column;
     align-items: center;
- }
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
- .ms-welcome__main {
+.panel-header img {
+    margin-bottom: 10px;
+}
+
+.panel-header h1 {
+    margin: 5px 0;
+}
+
+.panel-header p {
+    margin: 5px 0 0 0;
+    opacity: 0.9;
+}
+
+/* Contenido principal */
+.panel-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+}
+
+/* Mensaje de sideload */
+.ms-welcome__main {
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;
@@ -39,40 +64,182 @@
     -webkit-flex: 1 0 0;
     flex: 1 0 0;
     padding: 10px 20px;
- }
- 
- .ms-welcome__main > h2 {
-     width: 100%;
-     text-align: center;
- }
- 
- .ms-welcome__features {
-     list-style-type: none;
-     margin-top: 20px;
- }
- 
- .ms-welcome__features.ms-List .ms-ListItem {
-     padding-bottom: 20px;
-     display: -webkit-flex;
-     display: flex;
- }
- 
- .ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
-     margin-right: 10px;
- }
- 
- .ms-welcome__action.ms-Button--hero {
-     margin-top: 30px;
- }
- 
-.ms-Button.ms-Button--hero .ms-Button-label {
-  color: #0078d7;
 }
 
-.ms-Button.ms-Button--hero:hover .ms-Button-label,
-.ms-Button.ms-Button--hero:focus .ms-Button-label{
-  color: #005a9e;
-  cursor: pointer;
+.ms-welcome__main > h2 {
+    width: 100%;
+    text-align: center;
+}
+
+/* Formulario de evaluación */
+.evaluation-form {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
+
+.evaluation-form h2 {
+    color: #0078d7;
+    border-bottom: 2px solid #0078d7 !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 20px;
+}
+
+/* Campos del formulario */
+.ms-Grid-row {
+    margin-bottom: 15px;
+}
+
+.ms-Label {
+    font-size: 14px;
+    color: #323130;
+    margin-bottom: 5px !important;
+}
+
+.ms-TextField-field {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.ms-TextField-field:focus {
+    outline: none;
+    border-color: #0078d7;
+    box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
+}
+
+.ms-TextField-field::placeholder {
+    color: #605e5c;
+    font-style: italic;
+}
+
+textarea.ms-TextField-field {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Botones de acción */
+.form-actions {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ms-Button {
+    min-width: 120px;
+    padding: 10px 20px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.ms-Button--primary {
+    background-color: #0078d7;
+    color: white;
+}
+
+.ms-Button--primary:hover {
+    background-color: #106ebe;
+}
+
+.ms-Button--primary:focus {
+    outline: 2px solid #0078d7;
+    outline-offset: 2px;
+}
+
+.ms-Button--default {
+    background-color: #f3f2f1;
+    color: #323130;
+    border: 1px solid #8a8886;
+}
+
+.ms-Button--default:hover {
+    background-color: #edebe9;
+}
+
+.ms-Button--hero {
+    background-color: #0078d7;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+}
+
+.ms-Button--hero:hover {
+    background-color: #106ebe;
+}
+
+.ms-Button-label {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Área de mensajes */
+#message-area {
+    padding: 10px;
+    border-radius: 2px;
+}
+
+#message-content {
+    padding: 10px;
+    font-size: 14px;
+}
+
+.message-success {
+    background-color: #dff6dd;
+    border-left: 4px solid #107c10;
+    color: #107c10;
+}
+
+.message-error {
+    background-color: #fde7e9;
+    border-left: 4px solid #a80000;
+    color: #a80000;
+}
+
+.message-info {
+    background-color: #eff6fc;
+    border-left: 4px solid #0078d7;
+    color: #0078d7;
+}
+
+/* Iconos */
+.ms-Icon {
+    font-size: 16px;
+}
+
+h2 .ms-Icon {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+    .form-actions {
+        -webkit-flex-direction: column;
+        flex-direction: column;
+    }
+    
+    .ms-Button {
+        width: 100%;
+    }
 }
 
 b {
