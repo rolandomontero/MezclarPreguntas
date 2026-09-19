@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mezclador de Preguntas</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/scripts/office.js" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .btn-shuffle {
+            background-color: #2b579a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .btn-shuffle:hover {
+            background-color: #1e3d6d;
+        }
+        #status {
+            margin-top: 20px;
+            color: #666;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Mezclador de Preguntas</h2>
+    <p>Haga clic en el botón para reorganizar las preguntas y sus opciones según los estilos definidos.</p>
+    <button id="shuffle-btn" class="btn-shuffle">Mezclar Ahora</button>
+    <div id="status"></div>
+
+    <script src="taskpane.js"></script>
+</body>
+</html>
