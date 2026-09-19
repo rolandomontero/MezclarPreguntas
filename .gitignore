@@ -1,1 +1,24 @@
-Nothing should be ignored in this case, as the changes only include source code files (.css, .html, .js) without any build artifacts, dependencies, or temporary files.
+```
+# Build artifacts
+dist/
+*.js
+*.css
+*.map
+*.LICENSE.txt
+
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+```

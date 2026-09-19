@@ -44,12 +44,16 @@ function setupEventListeners() {
   const btnCreate = document.getElementById("btn-create-eval");
   if (btnCreate) {
     btnCreate.addEventListener("click", handleCreateEvaluation);
+  } else {
+    console.error("No se encontró el botón btn-create-eval");
   }
   
   // Botón Cancelar
   const btnCancel = document.getElementById("btn-cancel");
   if (btnCancel) {
     btnCancel.addEventListener("click", handleCancel);
+  } else {
+    console.error("No se encontró el botón btn-cancel");
   }
   
   // Listeners para validación en tiempo real
@@ -73,6 +77,8 @@ function setupEventListeners() {
         // Validar campo al perder foco
         validateField(fieldId);
       });
+    } else {
+      console.error(`No se encontró el campo ${fieldId}`);
     }
   });
 }
@@ -143,11 +149,14 @@ function getFormData() {
  * Maneja el evento de crear evaluación
  */
 async function handleCreateEvaluation() {
+  console.log("Iniciando creación de evaluación...");
+  
   // Limpiar mensajes previos
   hideMessage();
   
   // Validar formulario
   if (!validateForm()) {
+    console.log("Validación fallida");
     showMessage(
       "Por favor complete todos los campos requeridos.",
       "error"
@@ -155,8 +164,11 @@ async function handleCreateEvaluation() {
     return;
   }
   
+  console.log("Validación exitosa, obteniendo datos...");
+  
   // Obtener datos del formulario
   evaluationData = getFormData();
+  console.log("Datos obtenidos:", evaluationData);
   
   // Mostrar estado de carga
   const btnCreate = document.getElementById("btn-create-eval");
@@ -165,8 +177,11 @@ async function handleCreateEvaluation() {
   btnCreate.innerHTML = '<span class="ms-Button-label"><i class="ms-Icon ms-Icon--Refresh"></i> Procesando...</span>';
   
   try {
+    console.log("Llamando a createEvaluationFromTemplate...");
     // Llamar a la función que crea el documento desde la plantilla
     await createEvaluationFromTemplate(evaluationData);
+    
+    console.log("Evaluación creada exitosamente");
     
     // Mostrar mensaje de éxito
     showMessage(
@@ -176,6 +191,8 @@ async function handleCreateEvaluation() {
     
   } catch (error) {
     console.error("Error al crear evaluación:", error);
+    console.error("Detalle del error:", error.message);
+    console.error("Stack trace:", error.stack);
     showMessage(
       "Error al crear la evaluación: " + error.message,
       "error"
@@ -192,13 +209,11 @@ async function handleCreateEvaluation() {
  * @param {Object} data - Datos de la evaluación
  */
 async function createEvaluationFromTemplate(data) {
+  console.log("Iniciando creación de documento Word...");
+  
   return Word.run(async (context) => {
     try {
-      // Insertar información de la evaluación en el documento
-      // NOTA: Esta es una implementación básica. En versiones futuras se puede:
-      // 1. Cargar la plantilla .dotx completa
-      // 2. Reemplazar marcadores de posición
-      // 3. Mezclar preguntas y alternativas
+      console.log("Dentro de Word.run, insertando contenido...");
       
       // Insertar encabezado con información de la evaluación
       const headerParagraph = context.document.body.insertParagraph(
@@ -209,8 +224,13 @@ async function createEvaluationFromTemplate(data) {
       headerParagraph.font.size = 16;
       headerParagraph.alignment = Word.Alignment.center;
       
-      // Insertar línea en blanco
-      context.document.body.insertParagraph("", Word.InsertLocation.after(headerParagraph));
+      console.log("Encabezado insertado");
+      
+      // Insertar línea en blanco después del encabezado
+      const blankLine1 = headerParagraph.insertParagraph(
+        "",
+        Word.InsertLocation.end
+      );
       
       // Insertar información detallada
       const infoText = 
@@ -220,51 +240,72 @@ async function createEvaluationFromTemplate(data) {
         `Fecha: ${formatDate(data.date)}\n` +
         `Versión: ${data.version}`;
       
-      const infoParagraph = context.document.body.insertParagraph(
+      const infoParagraph = headerParagraph.insertParagraph(
         infoText,
-        Word.InsertLocation.after(headerParagraph)
+        Word.InsertLocation.end
       );
       infoParagraph.font.size = 12;
       
-      // Insertar objetivos
-      context.document.body.insertParagraph("", Word.InsertLocation.after(infoParagraph));
+      console.log("Información detallada insertada");
       
-      const objectivesTitle = context.document.body.insertParagraph(
+      // Insertar línea en blanco después de la información
+      const blankLine2 = infoParagraph.insertParagraph(
+        "",
+        Word.InsertLocation.end
+      );
+      
+      // Insertar objetivos
+      const objectivesTitle = infoParagraph.insertParagraph(
         "Objetivos de Aprendizaje:",
-        Word.InsertLocation.after(infoParagraph)
+        Word.InsertLocation.end
       );
       objectivesTitle.font.bold = true;
       objectivesTitle.font.size = 14;
       
-      const objectivesParagraph = context.document.body.insertParagraph(
+      const objectivesParagraph = objectivesTitle.insertParagraph(
         data.objectives,
-        Word.InsertLocation.after(objectivesTitle)
+        Word.InsertLocation.end
       );
       objectivesParagraph.font.size = 12;
       
+      console.log("Objetivos insertados");
+      
       // Insertar separador
-      context.document.body.insertParagraph("", Word.InsertLocation.after(objectivesParagraph));
-      const separatorParagraph = context.document.body.insertParagraph(
+      const blankLine3 = objectivesParagraph.insertParagraph(
+        "",
+        Word.InsertLocation.end
+      );
+      
+      const separatorParagraph = objectivesParagraph.insertParagraph(
         "────────────────────────────────────────",
-        Word.InsertLocation.after(objectivesParagraph)
+        Word.InsertLocation.end
       );
       separatorParagraph.font.size = 10;
       
       // Insertar instrucciones para preguntas
-      context.document.body.insertParagraph("", Word.InsertLocation.after(separatorParagraph));
-      const questionsInstruction = context.document.body.insertParagraph(
+      const blankLine4 = separatorParagraph.insertParagraph(
+        "",
+        Word.InsertLocation.end
+      );
+      
+      const questionsInstruction = separatorParagraph.insertParagraph(
         "[Las preguntas se insertarán aquí en la próxima versión]",
-        Word.InsertLocation.after(separatorParagraph)
+        Word.InsertLocation.end
       );
       questionsInstruction.font.italic = true;
       questionsInstruction.font.color = "#666666";
       
+      console.log("Contenido completo insertado, sincronizando...");
+      
       await context.sync();
       
-      console.log("Evaluación creada exitosamente");
+      console.log("Documento Word creado exitosamente");
       
     } catch (error) {
-      console.error("Error en Word.run:", error);
+      console.error("Error dentro de Word.run:", error);
+      console.error("Nombre del error:", error.name);
+      console.error("Mensaje del error:", error.message);
+      console.error("Stack trace:", error.stack);
       throw error;
     }
   });
