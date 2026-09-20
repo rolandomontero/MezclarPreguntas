@@ -48,6 +48,13 @@ module.exports = async (env, options) => {
             filename: "assets/[name][ext][query]",
           },
         },
+        {
+          test: /\.docx$/,
+          type: "asset/resource",
+          generator: {
+            filename: "templates/[name][ext][query]",
+          },
+        },
       ],
     },
     plugins: [

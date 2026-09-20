@@ -5,6 +5,8 @@
 
 /* global document, Office, Word */
 
+import templateUrl from "../../assets/resource/PLANTILLA.docx";
+
 // Variables globales para el formulario
 let evaluationData = {
   name: '',
@@ -141,8 +143,24 @@ function getFormData() {
     date: document.getElementById("eval-date").value,
     unit: document.getElementById("eval-unit").value.trim(),
     topic: document.getElementById("eval-topic").value.trim(),
-    version: 1
+    version: Number(document.getElementById("eval-version").value) || 1
   };
+}
+
+async function loadTemplateBase64() {
+  const response = await fetch(templateUrl);
+  if (!response.ok) throw new Error('No se pudo cargar la plantilla de evaluación.');
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  let binary = '';
+  for (let index = 0; index < bytes.length; index += 1) binary += String.fromCharCode(bytes[index]);
+  return btoa(binary);
+}
+
+async function replaceText(context, body, searchText, replacement) {
+  const ranges = body.search(searchText, { matchCase: false, matchWholeWord: false });
+  ranges.load('items');
+  await context.sync();
+  ranges.items.forEach((range) => range.insertText(replacement, Word.InsertLocation.replace));
 }
 
 /**
@@ -169,7 +187,7 @@ async function handleCreateEvaluation() {
   // Obtener datos del formulario
   evaluationData = getFormData();
   console.log("Datos obtenidos:", evaluationData);
-  
+
   // Mostrar estado de carga
   const btnCreate = document.getElementById("btn-create-eval");
   const originalText = btnCreate.innerHTML;
@@ -205,7 +223,7 @@ async function handleCreateEvaluation() {
 }
 
 /**
- * Crea una nueva evaluación basada en la plantilla PLANTILLA EVALUACION CSJ.dotx
+ * Crea una nueva evaluación basada en la plantilla PLANTILLA.docx
  * @param {Object} data - Datos de la evaluación
  */
 async function createEvaluationFromTemplate(data) {
@@ -215,88 +233,22 @@ async function createEvaluationFromTemplate(data) {
     try {
       console.log("Dentro de Word.run, insertando contenido...");
       
-      // Insertar encabezado con información de la evaluación
-      const headerParagraph = context.document.body.insertParagraph(
-        `EVALUACIÓN: ${data.name}`,
-        Word.InsertLocation.start
-      );
-      headerParagraph.font.bold = true;
-      headerParagraph.font.size = 16;
-      headerParagraph.alignment = Word.Alignment.center;
-      
-      console.log("Encabezado insertado");
-      
-      // Insertar línea en blanco después del encabezado
-      const blankLine1 = headerParagraph.insertParagraph(
-        "",
-        Word.InsertLocation.end
-      );
-      
-      // Insertar información detallada
-      const infoText = 
-        `Curso: ${data.course}\n` +
-        `Unidad: ${data.unit}\n` +
-        `Tema: ${data.topic}\n` +
-        `Fecha: ${formatDate(data.date)}\n` +
-        `Versión: ${data.version}`;
-      
-      const infoParagraph = headerParagraph.insertParagraph(
-        infoText,
-        Word.InsertLocation.end
-      );
-      infoParagraph.font.size = 12;
-      
-      console.log("Información detallada insertada");
-      
-      // Insertar línea en blanco después de la información
-      const blankLine2 = infoParagraph.insertParagraph(
-        "",
-        Word.InsertLocation.end
-      );
-      
-      // Insertar objetivos
-      const objectivesTitle = infoParagraph.insertParagraph(
-        "Objetivos de Aprendizaje:",
-        Word.InsertLocation.end
-      );
-      objectivesTitle.font.bold = true;
-      objectivesTitle.font.size = 14;
-      
-      const objectivesParagraph = objectivesTitle.insertParagraph(
-        data.objectives,
-        Word.InsertLocation.end
-      );
-      objectivesParagraph.font.size = 12;
-      
-      console.log("Objetivos insertados");
-      
-      // Insertar separador
-      const blankLine3 = objectivesParagraph.insertParagraph(
-        "",
-        Word.InsertLocation.end
-      );
-      
-      const separatorParagraph = objectivesParagraph.insertParagraph(
-        "────────────────────────────────────────",
-        Word.InsertLocation.end
-      );
-      separatorParagraph.font.size = 10;
-      
-      // Insertar instrucciones para preguntas
-      const blankLine4 = separatorParagraph.insertParagraph(
-        "",
-        Word.InsertLocation.end
-      );
-      
-      const questionsInstruction = separatorParagraph.insertParagraph(
-        "[Las preguntas se insertarán aquí en la próxima versión]",
-        Word.InsertLocation.end
-      );
-      questionsInstruction.font.italic = true;
-      questionsInstruction.font.color = "#666666";
-      
-      console.log("Contenido completo insertado, sincronizando...");
-      
+      const body = context.document.body;
+      body.insertFileFromBase64(await loadTemplateBase64(), Word.InsertLocation.replace);
+      await context.sync();
+
+      await replaceText(context, body, 'PRUEBA', data.name);
+      await replaceText(context, body, '[UNIDAD]', data.unit);
+      await replaceText(context, body, '[Describe los Objetivos]', data.objectives);
+      await replaceText(context, body, '__ /___ / 2026', formatDate(data.date));
+      await replaceText(context, body, '[Curso]', data.course);
+      await replaceText(context, body, '[Tema]', data.topic);
+      await replaceText(context, body, '[Versión]', data.version);
+
+      // const details = body.insertParagraph(
+      //   `Curso: ${data.course}\nTema: ${data.topic}\nVersión: ${data.version}`,
+      //   Word.InsertLocation.end
+      // );
       await context.sync();
       
       console.log("Documento Word creado exitosamente");
@@ -332,6 +284,7 @@ function handleCancel() {
   document.getElementById("eval-course").value = '';
   document.getElementById("eval-unit").value = '';
   document.getElementById("eval-topic").value = '';
+  document.getElementById("eval-version").value = '1';
   
   // Restablecer fecha a hoy
   const today = new Date().toISOString().split('T')[0];
